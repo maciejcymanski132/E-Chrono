@@ -1,0 +1,157 @@
+
+
+{% extends 'base.html' %}
+{% block title %} Home {% endblock %}
+
+{% block body %}
+<div class="container">
+   <form action="/stopflight" method="POST">
+      <table id="activetable">
+         <tr class="nothover">
+            <th></th>
+            <th>Lot nr.</th>
+            <th>Pilot/Instruktor</th>
+            <th>Pasazer/Uczen</th>
+            <th>Statek P</th>
+            <th>Czas Startu</th>
+            <th>Czas ladowania</th>
+         </tr>
+         {% for a in active_flights %}
+         <tr>
+            <td><input type="checkbox" name=g{{a.flight_nr}}></td>
+            <td>{{a.flight_nr}}</td>
+            <td>{{a.pilot_instructor}}</td>
+            <td>{{a.passenger_student}}</td>
+            <td>{{a.glider}}</td>
+            <td>{{a.time_of_start}}</td>
+            <td>{{a.glider_landing_time}}</td>
+         </tr>
+         {% endfor %}
+         {% for ap in airplane_flights %}
+         <tr>
+            <td><input type="checkbox" name=a{{ap.flight_nr}}></td>
+            <td>{{ap.flight_nr}}</td>
+            <td>{{ap.airplane_pilot}}</td>
+            <td>-</td>
+            <td>{{ap.airplane}}</td>
+            <td>{{ap.time_of_start}}</td>
+            <td>{{ap.airplane_landing_time}}</td>
+         </tr>
+         {% endfor %}
+      </table>
+      <button id="EndFlight" type="submit" >ZAKONCZ</button>
+   </form>
+   <form action="/startflight" method="POST">
+      <table id="chronotable">
+         <tr class="nothover">
+            <th></th>
+            <th>Lot nr.</th>
+            <th>Pilot/Instruktor</th>
+            <th>Pasazer/Uczen</th>
+            <th>Szybowiec</th>
+            <th>S.Holujacy</th>
+            <th>Czas Startu</th>
+            <th>Czas ladowania(SZ)</th>
+            <th>Czas ladowania(S)</th>
+            <th>Czas w powietrzu(SZ)</th>
+            <th>Czas w powietrzu(S)</th>
+            <th>Rodzaj startu</th>
+            <th>Wyciagarkowy/Pilot</th>
+         </tr>
+         {% for c in chrono %}
+         <tr>
+            <td><input type="checkbox"  name={{c.flight_nr}}></td>
+            <td>{{c.flight_nr}}</td>
+            <td>{{c.pilot_instructor}}</td>
+            <td>{{c.passenger_student}}</td>
+            <td>{{c.glider}}</td>
+            <td>{{c.airplane}}</td>
+            <td>{{c.time_of_start}}</td>
+            <td>{{c.glider_landing_time}}</td>
+            <td>{{c.airplane_landing_time}}</td>
+            <td>{{c.glider_tia}}</td>
+            <td>{{c.airplane_tia}}</td>
+            <td>{{c.start_type}}</td>
+            {% if c.winch_pilot == '' %}
+            <td>{{ c.airplane_pilot }}</td>
+            {% else %}
+            <td>{{c.winch_pilot}}</td>
+            {% endif %}
+         </tr>
+         {% endfor %}
+      </table>
+      <button id="StartFlight" type="submit">Rozpocznij lot</button>
+      <button id ="AddNew" type=button data-toggle="modal" data-target="#mymodal">Dodaj</button>
+      <button id ="Delete" type="submit" formaction="/deleteflight">Usun</button>
+
+      </form>
+</div>
+
+
+
+<div id="mymodal" class="modal fade" role="dialog">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+   <h4 class="modal-title">Dodaj nowy lot</h4>
+</div>
+<div class="modal-body">
+   <form action="{{url_for('print_hi')}}" method="POST">
+
+      <div class="form-group">
+         <label>Pilot/Instruktor:</label>
+         <input type="text" class="form-control" name="pilot_instructor" required="1">
+      </div>
+
+      <div class="form-group">
+         <label>Pasazer/Uczen:</label>
+         <input type="text" class="form-control" name="passenger_student" required="1">
+      </div>
+
+      <div class="form-group">
+         <label>Szybowiec:</label>
+         <select name="glider" id="glider">
+            <option value=none>-</option>
+         {% for glider in gliders %}
+            <option value={{glider.name}}>{{glider.name}}</option>
+         {% endfor %}
+         </select>
+      </div>
+
+      <div class="form-group">
+         <label>Samolot Holujacy:</label>
+         <select name="airplane" id="airplane">
+            <option value='-'>-</option>
+         {% for plane in airplanes %}
+            <option value={{plane.name}}>{{plane.name}}</option>
+         {% endfor %}
+         </select>
+      </div>
+
+      <div class="form-group">
+         <label>Rodzaj startu:</label>
+         <select name="start_type" id="start_type">
+         <option value="W">Wyciagarka</option>
+         <option value="S">Samolot</option>
+         </select>
+      </div>
+
+      <div class="form-group">
+         <label>Pilot samolotu:</label>
+         <input type="text" class="form-control" name="airplane_pilot">
+      </div>
+
+      <div class="form-group">
+         <label>Wyciagarkowy:</label>
+         <input type="text" class="form-control" name="winch_pilot">
+      </div>
+
+      <div class="form-group">
+         <button class="btn btn-primary" type="submit">Dodaj</button>
+      </div>
+
+   </form>
+</div>
+
+{% endblock %}
+
