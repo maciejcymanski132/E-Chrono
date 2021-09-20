@@ -26,8 +26,8 @@ if __name__ == '__main__':
                         start_type='S',
                         winch_pilot = '',
                         airplane_pilot = "M.Lewandowski",
-                        pilot_instructor = 1,
-                        passenger_student = 1,
+                        pilot_instructor = "M.Cymanski",
+                        passenger_student = "-",
                         glider = 'Puchacz-3351',
                         airplane = 'SP-CAS'
         )
@@ -41,8 +41,8 @@ if __name__ == '__main__':
                         start_type='W',
                         winch_pilot = 'L.Szaduro',
                         airplane_pilot = '',
-                        pilot_instructor = '2',
-                        passenger_student = '2',
+                        pilot_instructor = 'R.Manka',
+                        passenger_student = 'K.Jaworska',
                         glider = 'Puchacz-3351',
                         airplane = '-'
         )
@@ -56,8 +56,54 @@ if __name__ == '__main__':
                         start_type='S',
                         winch_pilot = '',
                         airplane_pilot = "M.Lewandowski",
-                        pilot_instructor = '3',
-                        passenger_student = '3',
+                        pilot_instructor = 'R.Berk',
+                        passenger_student = 'T.Kowalski',
+                        glider = 'Puchacz-3351',
+                        airplane = 'SP-CAS'
+        )
+
+    a1 = ActiveFlights(
+                        date = '06/07/2021',
+                        time_of_start="-",
+                        glider_landing_time="-",
+                        airplane_landing_time="-",
+                        glider_tia = "-",
+                        airplane_tia = "-",
+                        start_type='S',
+                        winch_pilot = '',
+                        airplane_pilot = "M.Lewandowski",
+                        pilot_instructor = "T.Bienkowski",
+                        passenger_student = "-",
+                        glider = 'Puchacz-3351',
+                        airplane = 'SP-CAS'
+        )
+    a2= ActiveFlights(
+                        date = '06/07/2021',
+                        time_of_start="-",
+                        glider_landing_time="-",
+                        airplane_landing_time="-",
+                        glider_tia = "-",
+                        airplane_tia = "-",
+                        start_type='W',
+                        winch_pilot = 'L.Szaduro',
+                        airplane_pilot = '',
+                        pilot_instructor = 'T.Zbucki',
+                        passenger_student = '-',
+                        glider = 'Puchacz-3351',
+                        airplane = '-'
+        )
+    a3 = ActiveFlights(
+                        date = '06/07/2021',
+                        time_of_start="-",
+                        glider_landing_time="-",
+                        airplane_landing_time="-",
+                        glider_tia = "-",
+                        airplane_tia = "-",
+                        start_type='S',
+                        winch_pilot = '',
+                        airplane_pilot = "M.Lewandowski",
+                        pilot_instructor = 'W.Tomczynski',
+                        passenger_student = '-',
                         glider = 'Puchacz-3351',
                         airplane = 'SP-CAS'
         )
@@ -65,6 +111,10 @@ if __name__ == '__main__':
     db.session.add(f1)
     db.session.add(f2)
     db.session.add(f3)
+    # db.session.add(a1)
+    # db.session.add(a2)
+    # db.session.add(a3)
+
     db.session.commit()
     db.session.close()
     print("ok")

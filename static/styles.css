@@ -7,6 +7,29 @@ table, #active_table{
   font-size: 13px;
 }
 
+tbody {
+    display:block;
+    height:250px;
+    overflow-y:scroll;
+}
+
+.navbar {
+    place-content: space-between;
+    width: 100%;
+    background-color: #75a3a3;
+    justify-content: center;
+    height: 60px;
+    }
+
+p   {
+        color: #ffffff;
+        margin-top: 0.25em;
+        font-weight: bold;
+        font-weight: 1000;
+        font-size: 1.3em;
+        text-align: center;
+    }
+
 tr:nth-child(even) {background-color: #f2f2f2;}
 
 tr:hover{background-color: #919191;}
@@ -16,13 +39,14 @@ tr:hover{background-color: #919191;}
  td {
   padding-top: 10px;
   padding-bottom: 10px;
-  width: 100px;
+  width: 120px;
 }
 
 th {
   padding-top: 10px;
   padding-bottom: 10px;
   text-transform: uppercase;
+  width: 120px;
 }
 
 button {
@@ -76,3 +100,10 @@ button {
 .container {
   margin-left: 10px;
 }
+
+.logo {
+        text-decoration: none;
+        font-weight: 1000;
+        font-size: 1.2em;
+        text-align:  center;
+            }
