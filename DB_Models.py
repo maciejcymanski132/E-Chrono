@@ -108,6 +108,35 @@ if __name__ == '__main__':
                         airplane = 'SP-CAS'
         )
 
+    id = db.Column('id',db.Integer, primary_key=True, autoincrement=True)
+    firstname = db.Column('firstname',db.String(25),nullable=False)
+    lastname = db.Column('lastname',db.String(25),nullable=False)
+    member = db.Column('member',db.Boolean)
+
+    p1 = Pilot(firstname='Roman',lastname='Berk',member=1)
+    p2 = Pilot(firstname='Ryszard',lastname='Manka',member=1)
+    p3 = Pilot(firstname='Jacek',lastname='Sobolewski',member=1)
+
+    ap1 = AirplanePilot(firstname='Maksymilian',lastname='Lewandowski',member=1)
+    ap2 = AirplanePilot(firstname='Jacek',lastname='Sobolewski',member=1)
+    ap3 = AirplanePilot(firstname='Sebastian',lastname='Jabłonski',member=1)
+
+    wo1 = WinchOperator(firstname='Jacek',lastname='Sobolewski',member=1)
+    wo2 = WinchOperator(firstname='Roman',lastname='Berk',member=1)
+    wo3 = WinchOperator(firstname='Lech',lastname='Szaduro',member=1)
+
+    db.session.add(p1)
+    db.session.add(p2)
+    db.session.add(p3)
+
+    db.session.add(wo1)
+    db.session.add(wo2)
+    db.session.add(wo3)
+
+    db.session.add(ap1)
+    db.session.add(ap2)
+    db.session.add(ap3)
+
     db.session.add(f1)
     db.session.add(f2)
     db.session.add(f3)

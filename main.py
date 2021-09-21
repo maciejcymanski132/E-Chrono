@@ -1,6 +1,6 @@
 from flask import render_template, request, url_for, redirect, Flask , flash
 from __init__ import app, db
-from __init__ import Chronometer, Glider, db, ActiveFlights, AirplaneFlight,Airplane
+from __init__ import Chronometer, Glider, db, ActiveFlights, AirplaneFlight,Airplane,Pilot,AirplanePilot,WinchOperator
 from jinja2 import Template
 import datetime
 
@@ -189,9 +189,13 @@ def print_hi():
     airplane = AirplaneFlight.query.all()
     airplanes = Airplane.query.all()
     gliders = Glider.query.all()
+    pilots= Pilot.query.all()
+    airplanepilots = AirplanePilot.query.all()
+    winchoperators = WinchOperator.query.all()
     return render_template(
         "main.html", active_flights=active, chrono=chrono,
-        airplane_flights=airplane,airplanes=airplanes,gliders=gliders
+        airplane_flights=airplane,airplanes=airplanes,gliders=gliders,pilots=pilots,
+        airplanepilots = airplanepilots, winchoperators = winchoperators
     )
 
 
@@ -201,14 +205,10 @@ def start_flight():
         id = next(iter(request.form))
         flight = Chronometer.query.filter(Chronometer.flight_nr == int(id)).first()
         if validate_flight(flight):
-            print('uno')
             active_obj = chrono_to_active(flight)
             active_obj.time_of_start = str(datetime.datetime.now())[11:16]
             if validate_active(active_obj):
-                print('dos')
-                print(active_obj.airplane)
                 if active_obj.airplane != '-':
-                    print('tres')
                     airplane_flight = active_to_airplane(active_obj)
                     db.session.add(airplane_flight)
                 db.session.add(active_obj)
@@ -234,7 +234,12 @@ def stop_flight():
                                             str(datetime.datetime.now())[11:16]),
                 )
             )
+            glider = Glider.query.filter(Glider.name == active_flight.glider).first()
+            glider.time_in_air += int(time_difference(
+                                            active_flight.time_of_start,
+                                            str(datetime.datetime.now())[11:16]))
             db.session.delete(active_flight)
+            db.session.commit()
 
         if id.startswith("a"):
             airplane_obj = AirplaneFlight.query.filter(
@@ -255,15 +260,8 @@ def stop_flight():
         db.session.commit()
     return redirect(url_for("print_hi"))
 
-@app.route('/updateflight',methods=['GET','POST'])
-def updateflight():
-    if request.method == 'POST':
-        my_data = Chronometer.query.get(request.form.get('id'))
-        my_data.name = request.form['name']
-        my_data.email = request.form['email']
-        my_data.phone = request.form['phone']
 
-        db.session.commit()
+
 @app.route('/deleteflight',methods=['POST','GET'])
 def deleteflight():
     if len(request.form) == 1:
@@ -272,6 +270,16 @@ def deleteflight():
         db.session.delete(chrono_obj)
         db.session.commit()
     return redirect(url_for('print_hi'))
+
+@app.route('/manage',methods=['POST','GET'])
+def manage():
+    airplanes = Airplane.query.all()
+    gliders = Glider.query.all()
+    pilots = Pilot.query.all()
+    airplanepilots = AirplanePilot.query.all()
+    winchoperators = WinchOperator.query.all()
+    return render_template('manage.html',airplanes=airplanes,gliders=gliders,pilots=pilots,
+        airplanepilots = airplanepilots, winchoperators = winchoperators)
 
 if __name__ == "__main__":
     app.run(debug=True)

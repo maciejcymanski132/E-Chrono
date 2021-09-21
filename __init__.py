@@ -23,6 +23,23 @@ class Airplane(db.Model):
     name = db.Column('name',db.String(20), nullable=False)
     time_in_air = db.Column('time_in_air', db.Integer)
 
+class AirplanePilot(db.Model):
+
+    __tablename__ = 'airplanepilot'
+    id = db.Column('id',db.Integer, primary_key=True, autoincrement=True)
+    firstname = db.Column('firstname',db.String(25),nullable=False)
+    lastname = db.Column('lastname',db.String(25),nullable=False)
+    member = db.Column('member',db.Boolean)
+
+class WinchOperator(db.Model):
+
+    __tablename__ = 'winchoperator'
+
+    id = db.Column('id',db.Integer, primary_key=True, autoincrement=True)
+    firstname = db.Column('firstname',db.String(25),nullable=False)
+    lastname = db.Column('lastname',db.String(25),nullable=False)
+    member = db.Column('member',db.Boolean)
+
 
 class Pilot(db.Model):
 

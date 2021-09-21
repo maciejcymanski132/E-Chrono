@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %} Home {% endblock %}
+
+{% block body %}
+<div class="manage">
+    <table>
+             <tr class="nothover">
+                <th>Imie:</th>
+                <th>Nazwisko</th>
+                <th>Czlonek</th>
+                 <th>Akcje</th>
+             </tr>
+        {% for p in pilots %}
+             <tr>
+                <td>{{p.firstname}}</td>
+                <td>{{p.lastname}}</td>
+                <td>{{p.member}}</td>
+             </tr>
+        {% endfor %}
+    </table>
+
+    <table>
+             <tr class="nothover">
+                <th>Imie:</th>
+                <th>Nazwisko</th>
+                <th>Czlonek</th>
+                 <th>Akcje</th>
+             </tr>
+        {% for p in airplanepilots %}
+             <tr>
+                <td>{{p.firstname}}</td>
+                <td>{{p.lastname}}</td>
+                <td>{{p.member}}</td>
+             </tr>
+        {% endfor %}
+    </table>
+
+
+    <table>
+             <tr class="nothover">
+                <th>Imie:</th>
+                <th>Nazwisko</th>
+                <th>Czlonek</th>
+                 <th>Akcje</th>
+             </tr>
+        {% for w in winchoperators %}
+             <tr>
+                <td>{{w.firstname}}</td>
+                <td>{{w.lastname}}</td>
+                <td>{{w.member}}</td>
+             </tr>
+        {% endfor %}
+    </table>
+
+
+    <table>
+             <tr class="nothover">
+                <th></th>
+                <th>Znaki wywolawcze:</th>
+                 <th>Czas w powietrzu:</th>
+             </tr>
+        {% for glider in gliders %}
+             <tr>
+                <td><input type="checkbox"></td>
+                <td>{{glider.name}}</td>
+                 <td>{{glider.time_in_air}}</td>
+             </tr>
+        {% endfor %}
+    </table>
+
+
+    <table>
+             <tr class="nothover">
+                <th></th>
+                <th>Znaki wywolawcze:</th>
+                 <th>Czas w powietrzu:</th>
+             </tr>
+        {% for a in airplanes %}
+             <tr>
+                <td><input type="checkbox"></td>
+                <td>{{a.name}}</td>
+                 <td>{{a.time_in_air}}</td>
+             </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

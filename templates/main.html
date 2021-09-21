@@ -8,7 +8,7 @@
    <form action="/stopflight" method="POST">
       <table id="activetable">
          <tr class="nothover">
-            <th></th>
+            <th>X</th>
             <th>Lot nr.</th>
             <th>Pilot/Instruktor</th>
             <th>Pasazer/Uczen</th>
@@ -100,7 +100,12 @@
 
       <div class="form-group">
          <label>Pilot/Instruktor:</label>
-         <input type="text" class="form-control" name="pilot_instructor" required="1">
+         <input type="text" class="form-control" name="pilot_instructor" id="srch" list="datalist1" required=1>
+         <datalist id="datalist1">
+           {% for pilot in pilots %}
+            <option value= "{{pilot.firstname}} {{pilot.lastname}}">
+            {% endfor %}
+         </datalist>
       </div>
 
       <div class="form-group">
@@ -138,12 +143,22 @@
 
       <div class="form-group">
          <label>Pilot samolotu:</label>
-         <input type="text" class="form-control" name="airplane_pilot">
+         <input type="text" class="form-control" name="airplane_pilot" list="datalist2" required=1 autocomplete="off">
+         <datalist id="datalist2">
+           {% for airplanepilot in airplanepilots %}
+            <option value= "{{airplanepilot.firstname}} {{airplanepilot.lastname}}">
+            {% endfor %}
+         </datalist>
       </div>
 
       <div class="form-group">
          <label>Wyciagarkowy:</label>
-         <input type="text" class="form-control" name="winch_pilot">
+         <input type="text" class="form-control" name="winch_pilot" list="datalist3" required=1>
+         <datalist id="datalist3">
+           {% for winchoperator in winchoperators %}
+            <option value= "{{winchoperator.firstname}} {{winchoperator.lastname}}">
+            {% endfor %}
+         </datalist>
       </div>
 
       <div class="form-group">
