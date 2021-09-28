@@ -5,74 +5,13 @@ from jinja2 import Template
 import datetime
 
 app.secret_key = "Secret Key"
-
-def refresh_tables(app_obj):
-    chrono_table = Template(
-        """<table id="chronotable">
-                <tr class="nothover">
-                    <th></th>
-                    <th>Pilot/Instruktor</th>
-                    <th>Pasazer/Uczen</th>
-                    <th>Szybowiec</th>
-                    <th>S.Holujacy</th>
-                    <th>Czas Startu</th>
-                    <th>Czas ladowania(SZ)</th>
-                    <th>Czas ladowania(S)</th>
-                    <th>Czas w powietrzu(SZ)</th>
-                    <th>Czas w powietrzu(S)</th>
-                    <th>Rodzaj startu</th>
-                    <th>Wyciagarkowy/Pilot</th>
-                </tr>
-                {% for c in chrono %}
-                <tr>
-                    <td><input type="checkbox" name={{c.flight_nr}}></td>
-                    <td>{{c.pilot_instructor}}</td>
-                    <td>{{c.passenger_student}}</td>
-                    <td>{{c.glider}}</td>
-                    <td>{{c.airplane}}</td>
-                    <td>{{c.time_of_start}}</td>
-                    <td>{{c.glider_landing_time}}</td>
-                    <td>{{c.airplane_landing_time}}</td>
-                    <td>{{c.glider_tia}}</td>
-                    <td>{{c.airplane_tia}}</td>
-                    <td>{{c.start_type}}</td>
-                    <td>{{c.winch_pilot}}</td>
-                </tr>
-                {% endfor %}
-            </table>"""
-    )
-
-    chrono_table = chrono_table.render(chrono=Chronometer.query.all())
-    app_obj.js.document.getElementById("chronotable").innerHTML = chrono_table
-    active_table = Template(
-        """
-    <table id="activetable">
-            <tr class="nothover">
-                <th></th>
-                <th>Pilot/Instruktor</th>
-                <th>Pasazer/Uczen</th>
-                <th>Szybowiec</th>
-                <th>Czas Startu</th>
-                <th>Czas ladowania(SZ)</th>
-                <th>Czas ladowania(S)</th>
-            </tr>
-            {% for a in active_flights %}
-            <tr>
-                <td><input type="checkbox" name={{a.flight_nr}}></td>
-                <td>{{a.pilot_instructor}}</td>
-                <td>{{a.passenger_student}}</td>
-                <td>{{a.glider}}</td>
-                <td>{{a.time_of_start}}</td>
-                <td>{{a.glider_landing_time}}</td>
-                <td>{{a.airplane_landing_time}}</td>
-            </tr>
-            {% endfor %}
-        </table>"""
-    )
-    active_table = active_table.render(active_flights=ActiveFlights.query.all())
-    app_obj.js.document.getElementById("activetable").innerHTML = active_table
-
-
+myrandomdict = {
+    'Pilot':Pilot,
+    'AirplanePilot':AirplanePilot,
+    'Glider':Glider,
+    'Airplane':Airplane,
+    'WinchOperator':WinchOperator
+}
 def chrono_to_active(chrono_object):
     return ActiveFlights(
         date="06/07/2021",
@@ -163,7 +102,7 @@ def active_to_airplane(active_object):
 
 
 @app.route("/", methods=["GET", "POST"])
-def print_hi():
+def main_page():
     if request.method == 'POST':
         if len(request.form) == 7:
             r = request.form
@@ -180,8 +119,7 @@ def print_hi():
                             airplane_pilot = r.get('airplane_pilot'),
                             glider = r.get('glider'),
                             airplane = r.get('airplane'))
-            print('almost')
-            if validate_start_type(o):
+            if validate_start_type(o) and (not r.get('winch_pilot') or not r.get('airplane_pilot')):
                 db.session.add(o)
                 db.session.commit()
     chrono = Chronometer.query.all()
@@ -213,53 +151,55 @@ def start_flight():
                     db.session.add(airplane_flight)
                 db.session.add(active_obj)
             db.session.commit()
-    return redirect(url_for("print_hi"))
+    return redirect(url_for("main_page"))
 
 
 @app.route("/stopflight", methods=["GET", "POST"])
 def stop_flight():
     if len(request.form) == 1:
         id = next(iter(request.form))
+
         if id.startswith("g"):
             active_flight = ActiveFlights.query.filter(
                 ActiveFlights.flight_nr == int(id[1:])).first()
+            timedif = time_difference(active_flight.time_of_start,
+                                      str(datetime.datetime.now())[11:16])
             Chronometer.query.filter(
                 Chronometer.flight_nr == active_flight.flight_nr
             ).update(
                 dict(
                     time_of_start=active_flight.time_of_start,
                     glider_landing_time=str(datetime.datetime.now())[11:16],
-                    glider_tia=time_difference(
-                                            active_flight.time_of_start,
-                                            str(datetime.datetime.now())[11:16]),
+                    glider_tia=timedif,
                 )
             )
             glider = Glider.query.filter(Glider.name == active_flight.glider).first()
-            glider.time_in_air += int(time_difference(
-                                            active_flight.time_of_start,
-                                            str(datetime.datetime.now())[11:16]))
+
+            glider.time_in_air += int(timedif.split(':')[0]) * 60 + int(timedif.split(':')[1])
             db.session.delete(active_flight)
             db.session.commit()
 
-        if id.startswith("a"):
+        elif id.startswith("a"):
             airplane_obj = AirplaneFlight.query.filter(
                 AirplaneFlight.flight_nr == int(id[1:])
             ).first()
+            timedif = time_difference(
+                        airplane_obj.time_of_start,
+                        str(datetime.datetime.now())[11:16])
             Chronometer.query.filter(
                 Chronometer.flight_nr == int(id[1:])
             ).update(
                 dict(
                     time_of_start=airplane_obj.time_of_start,
                     airplane_landing_time=str(datetime.datetime.now())[11:16],
-                    airplane_tia = time_difference(
-                        airplane_obj.time_of_start,
-                        str(datetime.datetime.now())[11:16])
+                    airplane_tia = timedif
                     )
                 )
+            airplane = Airplane.query.filter(Airplane.name == airplane_obj.airplane).first()
+            airplane.time_in_air += int(timedif.split(':')[0]) * 60 + int(timedif.split(':')[1])
             db.session.delete(airplane_obj)
         db.session.commit()
-    return redirect(url_for("print_hi"))
-
+    return redirect(url_for("main_page"))
 
 
 @app.route('/deleteflight',methods=['POST','GET'])
@@ -269,7 +209,8 @@ def deleteflight():
         chrono_obj = Chronometer.query.filter(Chronometer.flight_nr == id).first()
         db.session.delete(chrono_obj)
         db.session.commit()
-    return redirect(url_for('print_hi'))
+    return redirect(url_for('main_page'))
+
 
 @app.route('/manage',methods=['POST','GET'])
 def manage():
@@ -280,6 +221,34 @@ def manage():
     winchoperators = WinchOperator.query.all()
     return render_template('manage.html',airplanes=airplanes,gliders=gliders,pilots=pilots,
         airplanepilots = airplanepilots, winchoperators = winchoperators)
+
+
+@app.route('/delete',methods=['GET','POST'])
+def delete():
+    table = myrandomdict.get(request.args.get('table'))
+    obj = table.query.filter(table.id == request.args.get('id')).first()
+    db.session.delete(obj)
+    db.session.commit()
+    return redirect(url_for('manage'))
+
+
+@app.route('/update',methods=['GET','POST'])
+def update():
+    arguments = {argument:request.form.get(argument) for argument in request.form}
+    table = myrandomdict.get(request.args.get('table'))
+    table.query.filter(table.id == request.form.get('id')).update(arguments)
+    db.session.commit()
+    return redirect(url_for('manage'))
+
+
+@app.route('/add',methods=['GET','POST'])
+def add():
+    table = myrandomdict.get(request.args.get('table'))
+    argumentos = {argument:request.form.get(argument) for argument in request.form}
+    db.session.add(table(**argumentos))
+    db.session.commit()
+    return redirect(url_for('manage'))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

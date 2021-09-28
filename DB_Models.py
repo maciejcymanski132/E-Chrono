@@ -121,9 +121,9 @@ if __name__ == '__main__':
     ap2 = AirplanePilot(firstname='Jacek',lastname='Sobolewski',member=1)
     ap3 = AirplanePilot(firstname='Sebastian',lastname='Jabłonski',member=1)
 
-    wo1 = WinchOperator(firstname='Jacek',lastname='Sobolewski',member=1)
-    wo2 = WinchOperator(firstname='Roman',lastname='Berk',member=1)
-    wo3 = WinchOperator(firstname='Lech',lastname='Szaduro',member=1)
+    wo1 = WinchOperator(firstname='Jacek',lastname='Sobolewski',launches=5)
+    wo2 = WinchOperator(firstname='Roman',lastname='Berk',launches=4)
+    wo3 = WinchOperator(firstname='Lech',lastname='Szaduro',launches=3)
 
     db.session.add(p1)
     db.session.add(p2)

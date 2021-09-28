@@ -1,87 +1,414 @@
 {% extends 'base.html' %}
 {% block title %} Home {% endblock %}
-
 {% block body %}
 <div class="manage">
-    <table>
-             <tr class="nothover">
-                <th>Imie:</th>
-                <th>Nazwisko</th>
-                <th>Czlonek</th>
-                 <th>Akcje</th>
-             </tr>
-        {% for p in pilots %}
-             <tr>
-                <td>{{p.firstname}}</td>
-                <td>{{p.lastname}}</td>
-                <td>{{p.member}}</td>
-             </tr>
-        {% endfor %}
-    </table>
-
-    <table>
-             <tr class="nothover">
-                <th>Imie:</th>
-                <th>Nazwisko</th>
-                <th>Czlonek</th>
-                 <th>Akcje</th>
-             </tr>
-        {% for p in airplanepilots %}
-             <tr>
-                <td>{{p.firstname}}</td>
-                <td>{{p.lastname}}</td>
-                <td>{{p.member}}</td>
-             </tr>
-        {% endfor %}
-    </table>
-
-
-    <table>
-             <tr class="nothover">
-                <th>Imie:</th>
-                <th>Nazwisko</th>
-                <th>Czlonek</th>
-                 <th>Akcje</th>
-             </tr>
-        {% for w in winchoperators %}
-             <tr>
-                <td>{{w.firstname}}</td>
-                <td>{{w.lastname}}</td>
-                <td>{{w.member}}</td>
-             </tr>
-        {% endfor %}
-    </table>
-
-
-    <table>
-             <tr class="nothover">
-                <th></th>
-                <th>Znaki wywolawcze:</th>
-                 <th>Czas w powietrzu:</th>
-             </tr>
-        {% for glider in gliders %}
-             <tr>
-                <td><input type="checkbox"></td>
-                <td>{{glider.name}}</td>
-                 <td>{{glider.time_in_air}}</td>
-             </tr>
-        {% endfor %}
-    </table>
-
-
-    <table>
-             <tr class="nothover">
-                <th></th>
-                <th>Znaki wywolawcze:</th>
-                 <th>Czas w powietrzu:</th>
-             </tr>
-        {% for a in airplanes %}
-             <tr>
-                <td><input type="checkbox"></td>
-                <td>{{a.name}}</td>
-                 <td>{{a.time_in_air}}</td>
-             </tr>
-        {% endfor %}
-    </table>
+   <div class="container">
+      <div class="row">
+         <div class="jumbotron p-3">
+            <div class="col md-12">
+               <h2><b>Piloci</b>  <button type="button"  class="btn btn-success float-right"
+                  data-toggle="modal" data-target="#mymodalp">Dodaj nowego pilota</button> </h2>
+               <table style= "width:80em;">
+                  <tr style="width: 100%;">
+                     <th>Imię</th>
+                     <th>Nazwisko</th>
+                     <th>Akcje</th>
+                  </tr>
+                  {% for p in pilots %}
+                  <tr>
+                     <td>{{p.firstname}}</td>
+                     <td>{{p.lastname}}</td>
+                     <td style="display:flex;">
+                        <a class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaleditp{{p.id}}">Edytuj</a>
+                        <a href='/delete?table=Pilot&id={{p.id}}' class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Usuń</a>
+                     </td>
+                  </tr>
+                  <div id="modaleditp{{p.id}}" class="modal fade" role="dialog">
+                     <div class="modal-dialog">
+                        <div class="modal-content">
+                           <div class="modal-header">
+                              <h4 class="modal-title">Aktualizuj Informacje</h4>
+                           </div>
+                           <div class="modal-body">
+                              <form action="{{url_for('update')}}?table=Pilot" method="POST">
+                                 <div class="form-group">
+                                    <label>Imię:</label>
+                                    <input type="hidden"  name="id" value="{{p.id}}">
+                                    <input type="text" class="form-control" name="firstname" value="{{p.firstname}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <label>Nazwisko:</label>
+                                    <input type="text" class="form-control" name="lastname" value="{{p.lastname}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Aktualizuj</button>
+                                 </div>
+                              </form>
+                           </div>
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </table>
+               <div id="mymodalp" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h4 class="modal-title">Dodaj pilota</h4>
+                        </div>
+                        <div class="modal-body">
+                           <form action="{{url_for('add')}}?table=Pilot" method="POST">
+                              <div class="form-group">
+                                 <label>Imię:</label>
+                                 <input type="text" class="form-control" name="firstname" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <label>Nazwisko:</label>
+                                 <input type="text" class="form-control" name="lastname" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <button class="btn btn-primary" type="submit">Dodaj pilota</button>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="modal-footer">
+                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="container">
+      <div class="row">
+         <div class="jumbotron p-3">
+            <div class="col md-12">
+               <h2><b>Holownicy</b>  <button type="button"  class="btn btn-success float-right"
+                  data-toggle="modal" data-target="#mymodalap">Dodaj nowego holownika</button> </h2>
+               <table style= "width:80em;">
+                  <tr style="width: 100%;">
+                     <th>Imię</th>
+                     <th>Nazwisko</th>
+                     <th>Akcje</th>
+                  </tr>
+                  {% for a in airplanepilots %}
+                  <tr>
+                     <td>{{a.firstname}}</td>
+                     <td>{{a.lastname}}</td>
+                     <td style="display:flex;">
+                        <a class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaleditap{{a.id}}">Edytuj</a>
+                        <a href='/delete?table=AirplanePilot&id={{a.id}}' class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Usuń</a>
+                     </td>
+                  </tr>
+                  <div id="modaleditap{{a.id}}" class="modal fade" role="dialog">
+                     <div class="modal-dialog">
+                        <div class="modal-content">
+                           <div class="modal-header">
+                              <h4 class="modal-title">Aktualizuj Informacje</h4>
+                           </div>
+                           <div class="modal-body">
+                              <form action="{{url_for('update')}}?table=AirplanePilot" method="POST">
+                                 <div class="form-group">
+                                    <label>Imię:</label>
+                                    <input type="hidden"  name="id" value="{{a.id}}">
+                                    <input type="text" class="form-control" name="firstname" value="{{a.firstname}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <label>Nazwisko:</label>
+                                    <input type="text" class="form-control" name="lastname" value="{{a.lastname}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Aktualizuj</button>
+                                 </div>
+                              </form>
+                           </div>
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </table>
+               <div id="mymodalap" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h4 class="modal-title">Dodaj holownika</h4>
+                        </div>
+                        <div class="modal-body">
+                           <form action="{{url_for('add')}}?table=AirplanePilot" method="POST">
+                              <div class="form-group">
+                                 <label>Imię:</label>
+                                 <input type="text" class="form-control" name="firstname" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <label>Nazwisko:</label>
+                                 <input type="text" class="form-control" name="lastname" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <button class="btn btn-primary" type="submit">Dodaj holownika</button>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="modal-footer">
+                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="container">
+      <div class="row">
+         <div class="jumbotron p-3">
+            <div class="col md-12">
+               <h2><b>Wyciągarkowi</b>  <button type="button"  class="btn btn-success float-right"
+                  data-toggle="modal" data-target="#mymodalwo">Dodaj nowego wyciągarkowego</button> </h2>
+               <table style= "width:80em;">
+                  <tr style="width: 100%;">
+                     <th>Imię</th>
+                     <th>Nazwisko</th>
+                     <th>Ciągi</th>
+                     <th>Akcje</th>
+                  </tr>
+                  {% for w in winchoperators %}
+                  <tr>
+                     <td>{{w.firstname}}</td>
+                     <td>{{w.lastname}}</td>
+                     <td>{{w.launches}}</td>
+                     <td style="display:flex;">
+                        <a class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaleditwo{{w.id}}">Edytuj</a>
+                        <a href='/delete?table=WinchOperator&id={{w.id}}' class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Usuń</a>
+                     </td>
+                  </tr>
+                  <div id="modaleditwo{{w.id}}" class="modal fade" role="dialog">
+                     <div class="modal-dialog">
+                        <div class="modal-content">
+                           <div class="modal-header">
+                              <h4 class="modal-title">Aktualizuj Informacje</h4>
+                           </div>
+                           <div class="modal-body">
+                              <form action="{{url_for('update')}}?table=WinchOperator" method="POST">
+                                 <div class="form-group">
+                                    <label>Imię:</label>
+                                    <input type="hidden"  name="id" value="{{w.id}}">
+                                    <input type="text" class="form-control" name="firstname" value="{{w.firstname}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <label>Nazwisko:</label>
+                                    <input type="text" class="form-control" name="lastname" value="{{w.lastname}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <label>Ciągi:</label>
+                                    <input type="number" class="form-control" name="launches" value="{{w.launches}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Aktualizuj</button>
+                                 </div>
+                              </form>
+                           </div>
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </table>
+               <div id="mymodalwo" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h4 class="modal-title">Dodaj wyciągarkowego</h4>
+                        </div>
+                        <div class="modal-body">
+                           <form action="{{url_for('add')}}?table=WinchOperator" method="POST">
+                              <div class="form-group">
+                                 <label>Imię:</label>
+                                 <input type="text" class="form-control" name="firstname" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <label>Nazwisko:</label>
+                                 <input type="text" class="form-control" name="lastname" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <button class="btn btn-primary" type="submit">Dodaj wyciągarkowego</button>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="modal-footer">
+                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="container">
+      <div class="row">
+         <div class="jumbotron p-3">
+            <div class="col md-12">
+               <h2><b>Szybowce</b>  <button type="button"  class="btn btn-success float-right"
+                  data-toggle="modal" data-target="#mymodalg">Dodaj nowy szybowiec</button> </h2>
+               <table style= "width:80em;">
+                  <tr style="width: 100%;">
+                     <th>Znaki Wywolawcze</th>
+                     <th>Czas w powietrzu</th>
+                     <th>Akcje</th>
+                  </tr>
+                  {% for g in gliders %}
+                  <tr>
+                     <td>{{g.name}}</td>
+                     <td>{{g.time_in_air}}</td>
+                     <td style="display:flex;">
+                        <a class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaleditg{{g.id}}">Edytuj</a>
+                        <a href='/delete?table=Glider&id={{g.id}}' class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Usuń</a>
+                     </td>
+                  </tr>
+                  <div id="modaleditg{{g.id}}" class="modal fade" role="dialog">
+                     <div class="modal-dialog">
+                        <div class="modal-content">
+                           <div class="modal-header">
+                              <h4 class="modal-title">Aktualizuj Informacje</h4>
+                           </div>
+                           <div class="modal-body">
+                              <form action="{{url_for('update')}}?table=Glider" method="POST">
+                                 <div class="form-group">
+                                    <label>Znaki wywoławcze:</label>
+                                    <input type="hidden"  name="id" value="{{g.id}}">
+                                    <input type="text" class="form-control" name="name" value="{{g.name}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <label>Czas w powietrzu (min):</label>
+                                    <input type="number" class="form-control" name="time_in_air" value="{{g.time_in_air}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Aktualizuj</button>
+                                 </div>
+                              </form>
+                           </div>
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </table>
+               <div id="mymodalg" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h4 class="modal-title">Dodaj szybowiec</h4>
+                        </div>
+                        <div class="modal-body">
+                           <form action="{{url_for('add')}}?table=Glider" method="POST">
+                              <div class="form-group">
+                                 <label>Znaki wywoławcze:</label>
+                                 <input type="text" class="form-control" name="name" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <button class="btn btn-primary" type="submit">Dodaj szybowiec</button>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="modal-footer">
+                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="container" >
+      <div class="row" style="text-align: center;">
+         <div class="jumbotron p-3" style="text-align: center;">
+            <div class="col md-12" style="text-align: center;">
+               <h2><b>Samoloty</b>  <button type="button"  class="btn btn-success float-right"
+                  data-toggle="modal" data-target="#mymodala">Dodaj nowy samolot</button> </h2>
+               <table style= "width:80em;">
+                  <tr style="width: 100%;">
+                     <th>Znaki Wywolawcze</th>
+                     <th>Czas w powietrzu</th>
+                     <th>Akcje</th>
+                  </tr>
+                  {% for a in airplanes %}
+                  <tr>
+                     <td> {{ a.name }} </td>
+                     <td> {{ a.time_in_air }} </td>
+                     <td style="display:flex;">
+                        <a href='/update' class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledita{{a.id}}">Edytuj</a>
+                        <a href='/delete?table=Airplane&id={{a.id}}' class="btn btn-danger btn-xs" onclick="return confirm('Na pewno chcesz usunąć tą pozycje ?')">Usuń</a>
+                     </td>
+                  </tr>
+                  <div id="modaledita{{a.id}}" class="modal fade" role="dialog">
+                     <div class="modal-dialog">
+                        <div class="modal-content">
+                           <div class="modal-header">
+                              <h4 class="modal-title">Aktualizuj Informacje</h4>
+                           </div>
+                           <div class="modal-body">
+                              <form action="{{url_for('update')}}?table=Airplane" method="POST">
+                                 <div class="form-group">
+                                    <label>Znaki wywoławcze:</label>
+                                    <input type="hidden"  name="id" value="{{a.id}}">
+                                    <input type="text" class="form-control" name="name" value="{{a.name}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <label>Czas w powietrzu (min):</label>
+                                    <input type="number" class="form-control" name="time_in_air" value="{{a.time_in_air}}">
+                                 </div>
+                                 <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Aktualizuj</button>
+                                 </div>
+                              </form>
+                           </div>
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </table>
+               <div id="mymodala" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h4 class="modal-title">Dodaj samolot</h4>
+                        </div>
+                        <div class="modal-body">
+                           <form action="{{url_for('add')}}?table=Airplane" method="POST">
+                              <div class="form-group">
+                                 <label>Znaki wywoławcze:</label>
+                                 <input type="text" class="form-control" name="name" required="1">
+                              </div>
+                              <div class="form-group">
+                                 <button class="btn btn-primary" type="submit">Dodaj samolot</button>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="modal-footer">
+                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
 </div>
 {% endblock %}
