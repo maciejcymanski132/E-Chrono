@@ -6,6 +6,16 @@ app = Flask(__name__, template_folder='templates')
 app.config['SQLALCHEMY_DATABASE_URI']="sqlite:///my_db.db"
 db = SQLAlchemy(app)
 
+class User(db.Model):
+    __tablename__ = 'user'
+
+    id = db.Column('id',db.Integer, primary_key=True, autoincrement=True)
+    firstname = db.Column('firstname',db.String(25),nullable=False)
+    lastname = db.Column('lastname',db.String(25),nullable=False)
+    instructor = db.Column('instructor',db.Boolean,default=False)
+    winch_operator = db.Column('winch_operator',db.Boolean,default=False)
+    glider_pilot = db.Column('glider_pilot',db.Boolean,default=False)
+    airplane_pilot = db.Column('airplane_pilot', db.Boolean, default=False)
 
 class Glider(db.Model):
     __tablename__ = 'glider'
@@ -47,6 +57,8 @@ class Pilot(db.Model):
     id = db.Column('id',db.Integer, primary_key=True, autoincrement=True)
     firstname = db.Column('firstname',db.String(25),nullable=False)
     lastname = db.Column('lastname',db.String(25),nullable=False)
+    instructor = db.Column('instructor',db.Boolean,default=False)
+
 
 class AirplaneFlight(db.Model):
 
@@ -74,8 +86,8 @@ class ActiveFlights(db.Model):
     start_type = db.Column('start_type', db.String(1))
     winch_pilot = db.Column('winch_pilot', db.String(20))
     airplane_pilot = db.Column('airplane_pilot', db.String(20))
-    pilot_instructor = db.Column('pilot_instructor', db.String(15))
-    passenger_student = db.Column('passenger_student', db.String(15))
+    instructor = db.Column('instructor', db.String(15))
+    pilot_passenger = db.Column('pilot_passenger', db.String(15))
     glider = db.Column('glider', db.String(15))
     airplane = db.Column('airplane', db.String(15))
 
@@ -94,8 +106,8 @@ class Chronometer(db.Model):
     start_type = db.Column('start_type', db.String(1))
     winch_pilot = db.Column('winch_pilot', db.String(20))
     airplane_pilot = db.Column('airplane_pilot', db.String(20))
-    pilot_instructor = db.Column('pilot_instructor', db.String(15))
-    passenger_student = db.Column('passenger_student', db.String(15))
+    instructor = db.Column('instructor', db.String(15))
+    pilot_passenger= db.Column('pilot_passenger', db.String(15))
     glider = db.Column('glider', db.String(15),)
     airplane = db.Column('aeroplane', db.String(15))
 

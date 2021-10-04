@@ -1,17 +1,14 @@
-
-
 {% extends 'base.html' %}
 {% block title %} Home {% endblock %}
-
 {% block body %}
-<div class="container">
+<div class="container-sm" style="margin: left;">
    <form action="/stopflight" method="POST">
       <table id="activetable">
          <tr class="nothover">
             <th>X</th>
             <th>Lot nr.</th>
-            <th>Pilot/Instruktor</th>
-            <th>Pasazer/Uczen</th>
+            <th>Instruktor</th>
+            <th>Pilot/Pasażer</th>
             <th>Statek P</th>
             <th>Czas Startu</th>
             <th>Czas ladowania</th>
@@ -20,8 +17,8 @@
          <tr>
             <td><input type="checkbox" name=g{{a.flight_nr}}></td>
             <td>{{a.flight_nr}}</td>
-            <td>{{a.pilot_instructor}}</td>
-            <td>{{a.passenger_student}}</td>
+            <td>{{a.instructor}}</td>
+            <td>{{a.pilot_passenger}}</td>
             <td>{{a.glider}}</td>
             <td>{{a.time_of_start}}</td>
             <td>{{a.glider_landing_time}}</td>
@@ -62,8 +59,8 @@
          <tr>
             <td><input type="checkbox"  name={{c.flight_nr}}></td>
             <td>{{c.flight_nr}}</td>
-            <td>{{c.pilot_instructor}}</td>
-            <td>{{c.passenger_student}}</td>
+            <td>{{c.instructor}}</td>
+            <td>{{c.pilot_passenger}}</td>
             <td>{{c.glider}}</td>
             <td>{{c.airplane}}</td>
             <td>{{c.time_of_start}}</td>
@@ -72,7 +69,7 @@
             <td>{{c.glider_tia}}</td>
             <td>{{c.airplane_tia}}</td>
             <td>{{c.start_type}}</td>
-            {% if c.winch_pilot == '' %}
+            {% if c.winch_pilot == '-' %}
             <td>{{ c.airplane_pilot }}</td>
             {% else %}
             <td>{{c.winch_pilot}}</td>
@@ -83,11 +80,8 @@
       <button id="StartFlight" type="submit">Rozpocznij lot</button>
       <button id ="AddNew" type=button data-toggle="modal" data-target="#mymodal">Dodaj</button>
       <button id ="Delete" type="submit" formaction="/deleteflight">Usun</button>
-
-      </form>
+   </form>
 </div>
-
-
 
 <div id="mymodal" class="modal fade" role="dialog">
 <div class="modal-dialog">
@@ -99,27 +93,35 @@
    <form action="{{url_for('main_page')}}" method="POST">
 
       <div class="form-group">
-         <label>Pilot/Instruktor:</label>
-         <input type="text" class="form-control" name="pilot_instructor" id="srch" list="datalist1" required=1>
-         <datalist id="datalist1">
-           {% for pilot in pilots %}
-            <option value= "{{pilot.firstname}} {{pilot.lastname}}">
+         <label>Pilot/Pasażer:</label>
+         <select class="form-control" name="pilot_passenger">
+            <option value="Pasażer">Pasażer</option>
+            {% for user in users %}
+            {% if user.glider_pilot %}
+            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            {% endif %}
             {% endfor %}
-         </datalist>
+         </select>
       </div>
 
       <div class="form-group">
-         <label>Pasazer/Uczen:</label>
-         <input type="text" class="form-control" name="passenger_student" >
+         <label>Instruktor:</label>
+         <select class="form-control" name="instructor">
+            <option value='-'>-</option>
+            {% for user in users %}
+            {% if user.instructor %}
+            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            {% endif %}
+            {% endfor %}
+         </select>
       </div>
 
       <div class="form-group">
          <label>Szybowiec:</label>
          <select name="glider" id="glider">
-            <option value=none>-</option>
-         {% for glider in gliders %}
+            {% for glider in gliders %}
             <option value={{glider.name}}>{{glider.name}}</option>
-         {% endfor %}
+            {% endfor %}
          </select>
       </div>
 
@@ -127,48 +129,50 @@
          <label>Samolot Holujacy:</label>
          <select name="airplane" id="airplane">
             <option value='-'>-</option>
-         {% for plane in airplanes %}
+            {% for plane in airplanes %}
             <option value={{plane.name}}>{{plane.name}}</option>
-         {% endfor %}
+            {% endfor %}
          </select>
       </div>
-
       <div class="form-group">
          <label>Rodzaj startu:</label>
          <select name="start_type" id="start_type">
-         <option value="W">Wyciagarka</option>
-         <option value="S">Samolot</option>
+            <option value="W">Wyciagarka</option>
+            <option value="S">Samolot</option>
          </select>
       </div>
 
       <div class="form-group">
          <label>Pilot samolotu:</label>
-         <input type="text" class="form-control" name="airplane_pilot" list="datalist2" autocomplete="off">
-         <datalist id="datalist2">
-           {% for airplanepilot in airplanepilots %}
-            <option value= "{{airplanepilot.firstname}} {{airplanepilot.lastname}}">
+         <select class="form-control" name="airplane_pilot">
+            <option value='-'>-</option>
+            {% for user in users %}
+            {% if user.airplane_pilot %}
+            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            {% endif %}
             {% endfor %}
-         </datalist>
+         </select>
       </div>
 
       <div class="form-group">
-         <label>Wyciagarkowy:</label>
-         <input type="text" class="form-control" name="winch_pilot" list="datalist3">
-         <datalist id="datalist3">
-           {% for winchoperator in winchoperators %}
-            <option value= "{{winchoperator.firstname}} {{winchoperator.lastname}}">
+      <label>Wyciagarkowy:</label>
+         <select class="form-control" name="winch_pilot">
+            <option value='-'>-</option>
+            {% for user in users %}
+            {% if user.winch_operator %}
+            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            {% endif %}
             {% endfor %}
-         </datalist>
+         </select>
       </div>
-
       <div class="form-group">
-         <button class="btn btn-primary" type="submit">Dodaj</button>
+      <button class="btn btn-primary" type="submit">Dodaj</button>
       </div>
-                     <div class="modal-footer">
-                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
-                  </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+      </div>
    </form>
 </div>
-
+</div>
+</div>
 {% endblock %}
-

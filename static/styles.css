@@ -15,11 +15,23 @@ tbody {
 
 .manage{
     text-align: center;
-
-    .container {
-    text-align: center;
-        }
+    margin: auto;
 }
+
+.container {
+  margin-left: 10px;
+  margin: auto;
+  padding-top: 1em
+}
+
+.container-sm {
+  margin-left: 10px;
+  margin: left;
+  padding-top: 1em
+}
+
+
+
 
 .menu{
     background-color: #a3c2c2;
@@ -54,7 +66,6 @@ tr:hover{background-color: #919191;}
  td {
   padding-top: 10px;
   padding-bottom: 10px;
-  width: 45%;
 }
 
 th {
@@ -81,42 +92,7 @@ button {
   letter-spacing: 2px;
 }
 
-#StartFlight {
-  background-color: #3a7064; /* Green */
 
-}
-
-#AddNew {
-  background-color: #283252; /* Green */
-
-}
-
-  #Delete {
-  background-color: #283252; /* Green */
-}
-  #EndFlight {
-  background-color: #283252; /* Green */
-}
-
-#StartFlight:hover {
-  background-color: #438868; /* Green */
-}
-#AddNew:hover {
-  background-color: #3f5175; /* Green */
-}
-  #Delete:hover {
-  background-color: #3f5175; /* Green */
-}
-
-  #EndFlight:hover {
-  background-color: #3f5175; /* Green */
-}
-
-.container {
-  margin-left: 10px;
-  margin: auto;
-  padding-top: 1em
-}
 
 .logo {
         text-decoration: none;
@@ -148,5 +124,36 @@ nav li a {
 nav li a:hover {
   font-weight: bold;
   text-decoration: underline;
+}
+
+#StartFlight {
+  background-color: #3a7064; /* Green */
+
+}
+
+#AddNew {
+  background-color: #283252; /* Green */
+
+}
+
+  #Delete {
+  background-color: #283252; /* Green */
+}
+  #EndFlight {
+  background-color: #283252; /* Green */
+}
+
+#StartFlight:hover {
+  background-color: #438868; /* Green */
+}
+#AddNew:hover {
+  background-color: #3f5175; /* Green */
+}
+  #Delete:hover {
+  background-color: #3f5175; /* Green */
+}
+
+  #EndFlight:hover {
+  background-color: #3f5175; /* Green */
 }
 

@@ -1,17 +1,19 @@
-from flask import render_template, request, url_for, redirect, Flask , flash
-from __init__ import app, db
-from __init__ import Chronometer, Glider, db, ActiveFlights, AirplaneFlight,Airplane,Pilot,AirplanePilot,WinchOperator
+from flask import render_template, request, url_for, redirect
+from __init__ import Chronometer, Glider, db, ActiveFlights, AirplaneFlight,Airplane,Pilot,AirplanePilot,WinchOperator,app,User
 from jinja2 import Template
 import datetime
 
 app.secret_key = "Secret Key"
+
 myrandomdict = {
-    'Pilot':Pilot,
-    'AirplanePilot':AirplanePilot,
-    'Glider':Glider,
-    'Airplane':Airplane,
-    'WinchOperator':WinchOperator
+    'Pilot': Pilot,
+    'AirplanePilot': AirplanePilot,
+    'Glider': Glider,
+    'Airplane': Airplane,
+    'WinchOperator': WinchOperator,
+    'User':User
 }
+
 def chrono_to_active(chrono_object):
     return ActiveFlights(
         date="06/07/2021",
@@ -24,11 +26,12 @@ def chrono_to_active(chrono_object):
         start_type=chrono_object.start_type,
         winch_pilot=chrono_object.winch_pilot,
         airplane_pilot=chrono_object.airplane_pilot,
-        pilot_instructor=chrono_object.pilot_instructor,
-        passenger_student=chrono_object.passenger_student,
+        instructor=chrono_object.instructor,
+        pilot_passenger=chrono_object.pilot_passenger,
         glider=chrono_object.glider,
         airplane=chrono_object.airplane,
     )
+
 
 def active_to_chrono(active_object):
     return Chronometer(
@@ -42,11 +45,20 @@ def active_to_chrono(active_object):
         start_type=active_object.start_type,
         winch_pilot=active_object.winch_pilot,
         airplane_pilot=active_object.airplane_pilot,
-        pilot_instructor=active_object.pilot_instructor,
-        passenger_student=active_object.passenger_student,
+        instructor=active_object.instructor,
+        pilot_passenger=active_object.pilot_passenger,
         glider=active_object.glider,
         airplane=active_object.airplane,
     )
+
+
+def flip_booleans(arguments):
+    for key,value in arguments.items():
+        if value == 'true':
+            arguments[key] = True
+        if value == 'false':
+            arguments[key] = False
+
 
 def aircrafts_taken(flight):
     airplanes_taken = [
@@ -59,11 +71,13 @@ def aircrafts_taken(flight):
         return False
     return True
 
+
 def validate_start_type(flight):
     if (flight.airplane == '-' and flight.start_type == 'W') or \
     (flight.airplane != '-' and flight.start_type == 'S'):
         return True
     return False
+
 
 def validate_flight(flight):
     active_ids = [
@@ -76,12 +90,13 @@ def validate_flight(flight):
     ):
         return True
 
-def validate_active(active_obj):
-    print(active_obj.airplane_pilot,active_obj.winch_pilot)
-    if active_obj.airplane_pilot == '' and active_obj.winch_pilot == ''\
-            or active_obj.airplane_pilot != '' and active_obj.winch_pilot != '':
+
+def validate_operators(active_obj):
+    if active_obj.airplane_pilot == '-' and active_obj.winch_pilot == '-'\
+            or active_obj.airplane_pilot != '-' and active_obj.winch_pilot != '-':
         return False
     return True
+
 
 def time_difference(time1, time2):
     t1 = datetime.datetime.strptime(time1, "%H:%M")
@@ -107,8 +122,8 @@ def main_page():
         if len(request.form) == 7:
             r = request.form
             o = Chronometer(date='12/06/2021',
-                            pilot_instructor = r.get('pilot_instructor'),
-                            passenger_student = r.get('passenger_student'),
+                            instructor = r.get('instructor'),
+                            pilot_passenger = r.get('pilot_passenger'),
                             time_of_start = '-',
                             glider_landing_time='-',
                             airplane_landing_time='-',
@@ -119,7 +134,9 @@ def main_page():
                             airplane_pilot = r.get('airplane_pilot'),
                             glider = r.get('glider'),
                             airplane = r.get('airplane'))
-            if validate_start_type(o) and (not r.get('winch_pilot') or not r.get('airplane_pilot')):
+
+            if validate_start_type(o) and validate_operators(o) and\
+                    (r.get('winch_pilot') == '-' or r.get('airplane_pilot') == '-'):
                 db.session.add(o)
                 db.session.commit()
     chrono = Chronometer.query.all()
@@ -127,13 +144,10 @@ def main_page():
     airplane = AirplaneFlight.query.all()
     airplanes = Airplane.query.all()
     gliders = Glider.query.all()
-    pilots= Pilot.query.all()
-    airplanepilots = AirplanePilot.query.all()
-    winchoperators = WinchOperator.query.all()
+    users = User.query.all()
     return render_template(
         "main.html", active_flights=active, chrono=chrono,
-        airplane_flights=airplane,airplanes=airplanes,gliders=gliders,pilots=pilots,
-        airplanepilots = airplanepilots, winchoperators = winchoperators
+        airplane_flights=airplane,airplanes=airplanes,gliders=gliders,users = users
     )
 
 
@@ -145,10 +159,15 @@ def start_flight():
         if validate_flight(flight):
             active_obj = chrono_to_active(flight)
             active_obj.time_of_start = str(datetime.datetime.now())[11:16]
-            if validate_active(active_obj):
+            if validate_operators(active_obj):
                 if active_obj.airplane != '-':
                     airplane_flight = active_to_airplane(active_obj)
                     db.session.add(airplane_flight)
+                if active_obj.winch_pilot != '-':
+                    for operator in WinchOperator.query.all():
+                        if active_obj.winch_pilot == f'{operator.firstname} {operator.lastname}':
+                            winch_operator = operator
+                            winch_operator.launches = winch_operator.launches + 1
                 db.session.add(active_obj)
             db.session.commit()
     return redirect(url_for("main_page"))
@@ -158,7 +177,6 @@ def start_flight():
 def stop_flight():
     if len(request.form) == 1:
         id = next(iter(request.form))
-
         if id.startswith("g"):
             active_flight = ActiveFlights.query.filter(
                 ActiveFlights.flight_nr == int(id[1:])).first()
@@ -219,8 +237,9 @@ def manage():
     pilots = Pilot.query.all()
     airplanepilots = AirplanePilot.query.all()
     winchoperators = WinchOperator.query.all()
+    users = User.query.all()
     return render_template('manage.html',airplanes=airplanes,gliders=gliders,pilots=pilots,
-        airplanepilots = airplanepilots, winchoperators = winchoperators)
+        airplanepilots = airplanepilots, winchoperators = winchoperators,users = users)
 
 
 @app.route('/delete',methods=['GET','POST'])
@@ -235,8 +254,10 @@ def delete():
 @app.route('/update',methods=['GET','POST'])
 def update():
     arguments = {argument:request.form.get(argument) for argument in request.form}
+    flip_booleans(arguments)
     table = myrandomdict.get(request.args.get('table'))
     table.query.filter(table.id == request.form.get('id')).update(arguments)
+    print(table.query.filter(table.id == request.form.get('id')).all(),arguments)
     db.session.commit()
     return redirect(url_for('manage'))
 
@@ -244,8 +265,9 @@ def update():
 @app.route('/add',methods=['GET','POST'])
 def add():
     table = myrandomdict.get(request.args.get('table'))
-    argumentos = {argument:request.form.get(argument) for argument in request.form}
-    db.session.add(table(**argumentos))
+    arguments = {argument:request.form.get(argument) for argument in request.form}
+    flip_booleans(arguments)
+    db.session.add(table(**arguments))
     db.session.commit()
     return redirect(url_for('manage'))
 
