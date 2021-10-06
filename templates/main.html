@@ -11,28 +11,32 @@
             <th>Pilot/Pasażer</th>
             <th>Statek P</th>
             <th>Czas Startu</th>
-            <th>Czas ladowania</th>
          </tr>
-         {% for a in active_flights %}
+         {% for c in chrono %}
+         {% if c.active %}
          <tr>
-            <td><input type="checkbox" name=g{{a.flight_nr}}></td>
-            <td>{{a.flight_nr}}</td>
-            <td>{{a.instructor}}</td>
-            <td>{{a.pilot_passenger}}</td>
-            <td>{{a.glider}}</td>
-            <td>{{a.time_of_start}}</td>
-            <td>{{a.glider_landing_time}}</td>
+            <td><input type="checkbox" name=g{{c.flight_nr}}></td>
+            <td>{{c.flight_nr}}</td>
+            <td>{{c.instructor.firstname}} {{c.instructor.lastname}}</td>
+            <td>{{c.pilot_passenger.firstname}} {{c.pilot_passenger.lastname}}</td>
+            <td>{{c.glider.name}}</td>
+            <td>{{c.time_of_start}}</td>
          </tr>
+         {% endif %}
          {% endfor %}
+
          {% for ap in airplane_flights %}
          <tr>
             <td><input type="checkbox" name=a{{ap.flight_nr}}></td>
             <td>{{ap.flight_nr}}</td>
-            <td>{{ap.airplane_pilot}}</td>
+            {% for u in users %}
+            {% if u.id == ap.airplane_pilot %}
+            <td>{{u.firstname}} {{u.lastname}}</td>
+            {% endif %}
+            {% endfor %}
             <td>-</td>
             <td>{{ap.airplane}}</td>
             <td>{{ap.time_of_start}}</td>
-            <td>{{ap.airplane_landing_time}}</td>
          </tr>
          {% endfor %}
       </table>
@@ -59,20 +63,20 @@
          <tr>
             <td><input type="checkbox"  name={{c.flight_nr}}></td>
             <td>{{c.flight_nr}}</td>
-            <td>{{c.instructor}}</td>
-            <td>{{c.pilot_passenger}}</td>
-            <td>{{c.glider}}</td>
-            <td>{{c.airplane}}</td>
+            <td>{{c.instructor.firstname}} {{c.instructor.lastname}}</td>
+            <td>{{c.pilot_passenger.firstname}} {{c.pilot_passenger.lastname}}</td>
+            <td>{{c.glider.name}}</td>
+            <td>{{c.airplane.name}}</td>
             <td>{{c.time_of_start}}</td>
             <td>{{c.glider_landing_time}}</td>
             <td>{{c.airplane_landing_time}}</td>
             <td>{{c.glider_tia}}</td>
             <td>{{c.airplane_tia}}</td>
             <td>{{c.start_type}}</td>
-            {% if c.winch_pilot == '-' %}
-            <td>{{ c.airplane_pilot }}</td>
+            {% if c.winch_operator %}
+            <td>{{ c.winch_operator.firstname }} {{c.winch_operator.lastname}}</td>
             {% else %}
-            <td>{{c.winch_pilot}}</td>
+            <td>{{ c.tow_pilot.firstname }} {{c.tow_pilot.lastname}}</td>
             {% endif %}
          </tr>
          {% endfor %}
@@ -95,10 +99,10 @@
       <div class="form-group">
          <label>Pilot/Pasażer:</label>
          <select class="form-control" name="pilot_passenger">
-            <option value="Pasażer">Pasażer</option>
+            <option value="0">Pasażer</option>
             {% for user in users %}
             {% if user.glider_pilot %}
-            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            <option value="{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>
             {% endif %}
             {% endfor %}
          </select>
@@ -110,7 +114,7 @@
             <option value='-'>-</option>
             {% for user in users %}
             {% if user.instructor %}
-            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            <option value= "{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>
             {% endif %}
             {% endfor %}
          </select>
@@ -120,7 +124,7 @@
          <label>Szybowiec:</label>
          <select name="glider" id="glider">
             {% for glider in gliders %}
-            <option value={{glider.name}}>{{glider.name}}</option>
+            <option value={{glider.id}}>{{glider.name}}</option>
             {% endfor %}
          </select>
       </div>
@@ -130,7 +134,7 @@
          <select name="airplane" id="airplane">
             <option value='-'>-</option>
             {% for plane in airplanes %}
-            <option value={{plane.name}}>{{plane.name}}</option>
+            <option value={{plane.id}}>{{plane.name}}</option>
             {% endfor %}
          </select>
       </div>
@@ -148,7 +152,7 @@
             <option value='-'>-</option>
             {% for user in users %}
             {% if user.airplane_pilot %}
-            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            <option value= "{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>
             {% endif %}
             {% endfor %}
          </select>
@@ -160,7 +164,7 @@
             <option value='-'>-</option>
             {% for user in users %}
             {% if user.winch_operator %}
-            <option value= "{{user.firstname}} {{user.lastname}}"> {{user.firstname}} {{user.lastname}}</option>
+            <option value= "{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>
             {% endif %}
             {% endfor %}
          </select>
