@@ -1,7 +1,6 @@
 from flask import render_template, request, url_for, redirect
-from DB_Models import Chronometer, Glider, AirplaneFlight,Airplane,User
-from __init__ import app,db
 from ValidatorClass import *
+from create_populate_db import populate_db
 import datetime
 
 app.secret_key = "Secret Key"
@@ -191,4 +190,5 @@ def add():
 
 
 if __name__ == "__main__":
+    populate_db()
     app.run(debug=True)

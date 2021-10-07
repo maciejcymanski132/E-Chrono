@@ -99,7 +99,7 @@
       <div class="form-group">
          <label>Pilot/Pasażer:</label>
          <select class="form-control" name="pilot_passenger">
-            <option value="0">Pasażer</option>
+            <option value="1">Pasażer</option>
             {% for user in users %}
             {% if user.glider_pilot %}
             <option value="{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>

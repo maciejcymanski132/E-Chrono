@@ -4,7 +4,7 @@ import datetime
 
 class Validator:
 
-    def __init__(self,flight):
+    def __init__(self, flight):
         self.flight = flight
 
     def check_if_aircrafts_taken(self) -> bool:
@@ -44,10 +44,10 @@ class Validator:
         if self.flight.instructor:
             if not self.flight.instructor.instructor:
                 return False
-        if self.flight.pilot_passenger.id != 0:
+        if self.flight.pilot_passenger.id != 1:
             if not self.flight.pilot_passenger.glider_pilot:
                 return False
-        if self.flight.pilot_passenger.id == 0:
+        if self.flight.pilot_passenger.id == 1:
             if not self.flight.instructor:
                 return False
         if self.flight.winch_operator:
