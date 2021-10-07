@@ -1,44 +1,94 @@
 from __init__ import *
 
-if __name__ == '__main__':
-    db.create_all()
-    glider1 = Glider(name='Puchacz-3351')
-    glider2 = Glider(name='Junior-3296')
-    glider3 = Glider(name='Puchacz-3523')
-    db.session.add(glider1)
-    db.session.add(glider2)
-    db.session.add(glider3)
 
-    airplane1 = Airplane(name='SP-CAS')
-    airplane2 = Airplane(name='SP-WBK')
-    airplane3 = Airplane(name='SP-KBW')
-    db.session.add(airplane1)
-    db.session.add(airplane2)
-    db.session.add(airplane3)
+class User(db.Model):
+
+    __tablename__ = "user"
+
+    id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
+    firstname = db.Column("firstname", db.String(25), nullable=False)
+    lastname = db.Column("lastname", db.String(25), nullable=False)
+    instructor = db.Column("instructor", db.Boolean, default=False)
+    winch_operator = db.Column("winch_operator", db.Boolean, default=False)
+    glider_pilot = db.Column("glider_pilot", db.Boolean, default=False)
+    airplane_pilot = db.Column("airplane_pilot", db.Boolean, default=False)
+
+    tow_pulls = db.relationship(
+        "Chronometer",
+        backref="tow_pilot",
+        lazy="dynamic",
+        foreign_keys="Chronometer.tow_pilot_id",
+    )
+    winch_pulls = db.relationship(
+        "Chronometer",
+        backref="winch_operator",
+        lazy="dynamic",
+        foreign_keys="Chronometer.winch_operator_id",
+    )
+    instructor_flights = db.relationship(
+        "Chronometer",
+        backref="instructor",
+        lazy="dynamic",
+        foreign_keys="Chronometer.instructor_id",
+    )
+    flights = db.relationship(
+        "Chronometer",
+        backref="pilot_passenger",
+        lazy="dynamic",
+        foreign_keys="Chronometer.pilot_passenger_id",
+    )
 
 
-    u0 = User(firstname='Passenger',lastname='',id=0)
-    u1 = User(firstname='Roman',lastname='Berk',instructor=True,winch_operator=True,glider_pilot=True)
-    u2 = User(firstname='Ryszard',lastname='Manka',instructor=True,glider_pilot=True)
-    u3 = User(firstname='Jacek',lastname='Sobolewski',instructor=True,winch_operator=True,airplane_pilot=True,glider_pilot=True)
-    u4 = User(firstname='Maciej',lastname='Cymanski',glider_pilot=True)
-    u5 = User(firstname='Mikołaj',lastname='Szyszka',glider_pilot=True)
-    u6 = User(firstname='Maksymilian',lastname='Lewandowski',airplane_pilot=True,glider_pilot=True)
-    u7 = User(firstname='Sebastian',lastname='Jabłonski',airplane_pilot=True,glider_pilot=True)
-    u8 = User(firstname='Lech',lastname='Szaduro',winch_operator=True)
+class Chronometer(db.Model):
 
-    db.session.add(u0)
-    db.session.add(u1)
-    db.session.add(u2)
-    db.session.add(u3)
-    db.session.add(u4)
-    db.session.add(u5)
-    db.session.add(u6)
-    db.session.add(u7)
-    db.session.add(u8)
+    __tablename__ = "chrono"
+
+    flight_nr = db.Column("flight_nr", db.Integer, primary_key=True, autoincrement=True)
+    time_of_start = db.Column("time_of_start", db.String(5),default='-')
+    glider_landing_time = db.Column("glider_landing_time", db.String(5), nullable=False,default='-')
+    airplane_landing_time = db.Column("airplane_landing_time", db.String(5),default='-')
+    glider_tia = db.Column("glider_tia", db.String(5), nullable=False,default='-')
+    airplane_tia = db.Column("airplane_tia", db.String(5),default='-')
+    start_type = db.Column("start_type", db.String(1))
+
+    winch_operator_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    tow_pilot_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    instructor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    pilot_passenger_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    glider_id = db.Column(db.Integer, db.ForeignKey("glider.id"))
+    airplane_id = db.Column(db.Integer, db.ForeignKey("airplane.id"))
+
+    active = db.Column('active',db.Boolean,default=False)
 
 
-    db.session.commit()
-    db.session.close()
-    print("ok")
+class Glider(db.Model):
+    __tablename__ = "glider"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column("name", db.String(20), nullable=False)
+    time_in_air = db.Column("time_in_air", db.Integer, default=0)
+    flights = db.relationship("Chronometer", backref="glider")
+
+
+class Airplane(db.Model):
+
+    __tablename__ = "airplane"
+
+    id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column("name", db.String(20), nullable=False)
+    time_in_air = db.Column("time_in_air", db.Integer, default=0)
+
+    flights = db.relationship("Chronometer", backref="airplane")
+
+
+class AirplaneFlight(db.Model):
+
+    __tablename__ = "airplaneflight"
+
+    flight_nr = db.Column("flight_nr", db.Integer, primary_key=True)
+    time_of_start = db.Column("time_of_start", db.String(5))
+    airplane_pilot = db.Column("airplane_pilot", db.Integer)
+
+    airplane = db.Column("airplane", db.String(15))
+
 

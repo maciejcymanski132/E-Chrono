@@ -13,7 +13,7 @@
             <th>Czas Startu</th>
          </tr>
          {% for c in chrono %}
-         {% if c.active %}
+         {% if c.active  %}
          <tr>
             <td><input type="checkbox" name=g{{c.flight_nr}}></td>
             <td>{{c.flight_nr}}</td>
