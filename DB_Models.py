@@ -44,11 +44,15 @@ class Chronometer(db.Model):
     __tablename__ = "chrono"
 
     flight_nr = db.Column("flight_nr", db.Integer, primary_key=True, autoincrement=True)
-    time_of_start = db.Column("time_of_start", db.String(5),default='-')
-    glider_landing_time = db.Column("glider_landing_time", db.String(5), nullable=False,default='-')
-    airplane_landing_time = db.Column("airplane_landing_time", db.String(5),default='-')
-    glider_tia = db.Column("glider_tia", db.String(5), nullable=False,default='-')
-    airplane_tia = db.Column("airplane_tia", db.String(5),default='-')
+    time_of_start = db.Column("time_of_start", db.String(5), default="-")
+    glider_landing_time = db.Column(
+        "glider_landing_time", db.String(5), nullable=False, default="-"
+    )
+    airplane_landing_time = db.Column(
+        "airplane_landing_time", db.String(5), default="-"
+    )
+    glider_tia = db.Column("glider_tia", db.String(5), nullable=False, default="-")
+    airplane_tia = db.Column("airplane_tia", db.String(5), default="-")
     start_type = db.Column("start_type", db.String(1))
 
     winch_operator_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -58,7 +62,7 @@ class Chronometer(db.Model):
     glider_id = db.Column(db.Integer, db.ForeignKey("glider.id"))
     airplane_id = db.Column(db.Integer, db.ForeignKey("airplane.id"))
 
-    active = db.Column('active',db.Boolean,default=False)
+    active = db.Column("active", db.Boolean, default=False)
 
 
 class Glider(db.Model):
@@ -90,5 +94,3 @@ class AirplaneFlight(db.Model):
     airplane_pilot = db.Column("airplane_pilot", db.Integer)
 
     airplane = db.Column("airplane", db.String(15))
-
-
