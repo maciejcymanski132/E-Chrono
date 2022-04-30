@@ -38,6 +38,9 @@ class User(db.Model):
         foreign_keys="Chronometer.pilot_passenger_id",
     )
 
+    def __str__(self):
+        return f"{User.firstname} {User.lastname}"
+
 
 class Chronometer(db.Model):
 

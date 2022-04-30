@@ -2,10 +2,11 @@
 {% block title %} Home {% endblock %}
 {% block body %}
 <div class="container-sm" style="margin: left;">
-   <form action="/stopflight" method="POST">
+
+   <form action="{{url_for('stop_flight')}}" method="POST">
       <table id="activetable">
          <tr class="nothover">
-            <th>X</th>
+            <th></th>
             <th>Lot nr.</th>
             <th>Instruktor</th>
             <th>Pilot/Pasażer</th>
@@ -15,7 +16,7 @@
          {% for c in chrono %}
          {% if c.active  %}
          <tr>
-            <td><input type="checkbox" name=g{{c.flight_nr}}></td>
+            <td><input type="checkbox" name=g{{c.flight_nr}} id="glider"></td>
             <td>{{c.flight_nr}}</td>
             <td>{{c.instructor.firstname}} {{c.instructor.lastname}}</td>
             <td>{{c.pilot_passenger.firstname}} {{c.pilot_passenger.lastname}}</td>
@@ -42,7 +43,8 @@
       </table>
       <button id="EndFlight" type="submit" >ZAKONCZ</button>
    </form>
-   <form action="/startflight" method="POST">
+
+   <form action="{{url_for('start_flight')}}" method="POST">
       <table id="chronotable">
          <tr class="nothover">
             <th></th>
@@ -83,9 +85,16 @@
       </table>
       <button id="StartFlight" type="submit">Rozpocznij lot</button>
       <button id ="AddNew" type=button data-toggle="modal" data-target="#mymodal">Dodaj</button>
-      <button id ="Delete" type="submit" formaction="/deleteflight">Usun</button>
+      <button id ="Delete" type="submit" formaction="{{url_for('delete_flight')}}">Usun</button>
    </form>
 </div>
+
+
+
+
+
+
+
 
 <div id="mymodal" class="modal fade" role="dialog">
 <div class="modal-dialog">
@@ -94,7 +103,7 @@
    <h4 class="modal-title">Dodaj nowy lot</h4>
 </div>
 <div class="modal-body">
-   <form action="{{url_for('main_page')}}" method="POST">
+   <form action="{{url_for('add_flight')}}" method="POST">
 
       <div class="form-group">
          <label>Pilot/Pasażer:</label>
@@ -111,7 +120,7 @@
       <div class="form-group">
          <label>Instruktor:</label>
          <select class="form-control" name="instructor">
-            <option value='-'>-</option>
+            <option value=''>-</option>
             {% for user in users %}
             {% if user.instructor %}
             <option value= "{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>
@@ -122,7 +131,7 @@
 
       <div class="form-group">
          <label>Szybowiec:</label>
-         <select name="glider" id="glider">
+         <select name="glider">
             {% for glider in gliders %}
             <option value={{glider.id}}>{{glider.name}}</option>
             {% endfor %}
@@ -132,7 +141,7 @@
       <div class="form-group">
          <label>Samolot Holujacy:</label>
          <select name="airplane" id="airplane">
-            <option value='-'>-</option>
+            <option value=''>-</option>
             {% for plane in airplanes %}
             <option value={{plane.id}}>{{plane.name}}</option>
             {% endfor %}
@@ -149,7 +158,7 @@
       <div class="form-group">
          <label>Pilot samolotu:</label>
          <select class="form-control" name="airplane_pilot">
-            <option value='-'>-</option>
+            <option value=''>-</option>
             {% for user in users %}
             {% if user.airplane_pilot %}
             <option value= "{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>
@@ -161,7 +170,7 @@
       <div class="form-group">
       <label>Wyciagarkowy:</label>
          <select class="form-control" name="winch_pilot">
-            <option value='-'>-</option>
+            <option value=''>-</option>
             {% for user in users %}
             {% if user.winch_operator %}
             <option value= "{{user.id}}"> {{user.firstname}} {{user.lastname}}</option>
